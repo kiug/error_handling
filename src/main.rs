@@ -8,6 +8,7 @@ enum CustomError {
     IOErr(std::io::Error),
     AddrErr(std::net::AddrParseError),
     StdErr(Box<dyn std::error::Error>),
+    SrvErr,
 }
 
 impl std::fmt::Display for CustomError {
@@ -36,20 +37,24 @@ impl From<Box<dyn std::error::Error>> for CustomError {
 
 fn main() -> Result<(), CustomError> {
     println!("Error handling example!");
-    custom_error_handling()?;
-    std_error_handling()?;
+    custom_error()?;
+    std_via_custom_error()?;
+    std_error()?;
     Ok(())
 }
 
-fn custom_error_handling() -> Result<(), CustomError> {
+fn std_via_custom_error() -> Result<(), CustomError> {
     let _net = File::open("some-non-existant-file.txt")?;
     let _localhost: Ipv4Addr = "::1".parse()?;
-    std_error_handling()?;
     Ok(())
 }
 
-fn std_error_handling() -> Result<(), Box<dyn std::error::Error>> {
+fn std_error() -> Result<(), Box<dyn std::error::Error>> {
     let _net = File::open("some-non-existant-file.txt")?;
     let _localhost: Ipv4Addr = "::1".parse()?;
     Ok(())
+}
+
+fn custom_error() -> Result<(), CustomError> {
+    Err(CustomError::SrvErr)
 }
